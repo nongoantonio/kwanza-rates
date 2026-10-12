@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -10,4 +5,26 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum RateType {
+  OFFICIAL
+  PARALLEL
+}
+
+model ExchangeRate {
+  id        Int      @id @default(autoincrement())
+  type      RateType @default(OFFICIAL)
+  base      String
+  target    String
+  mid       Decimal  @db.Decimal(18, 4)
+  buy       Decimal? @db.Decimal(18, 4)
+  sell      Decimal? @db.Decimal(18, 4)
+  rateDate  DateTime @db.Date
+  source    String
+  createdAt DateTime @default(now())
+
+  @@unique([type, base, target, rateDate, source])
+  @@index([base, target, rateDate])
+  @@map("exchange_rates")
 }
